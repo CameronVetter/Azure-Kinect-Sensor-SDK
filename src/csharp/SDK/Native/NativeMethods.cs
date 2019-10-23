@@ -59,6 +59,63 @@ namespace Microsoft.Azure.Kinect.Sensor
             K4A_STREAM_RESULT_EOF,
         }
 
+        [NativeReference]
+        public enum k4abt_sensor_orientation_t
+        {
+            K4ABT_SENSOR_ORIENTATION_DEFAULT = 0,
+            K4ABT_SENSOR_ORIENTATION_CLOCKWISE90,
+            K4ABT_SENSOR_ORIENTATION_COUNTERCLOCKWISE90,
+            K4ABT_SENSOR_ORIENTATION_FLIP180,
+        }
+
+        [NativeReference]
+        public enum k4abt_joint_confidence_level_t
+        {
+            K4ABT_JOINT_CONFIDENCE_NONE = 0,
+            K4ABT_JOINT_CONFIDENCE_LOW,
+            K4ABT_JOINT_CONFIDENCE_MEDIUM,
+            K4ABT_JOINT_CONFIDENCE_HIGH,
+            K4ABT_JOINT_CONFIDENCE_LEVELS_COUNT,
+        }
+
+        [NativeReference]
+        public enum k4abt_joint_id_t
+        {
+            K4ABT_JOINT_PELVIS = 0,
+            K4ABT_JOINT_SPINE_NAVAL,
+            K4ABT_JOINT_SPINE_CHEST,
+            K4ABT_JOINT_NECK,
+            K4ABT_JOINT_CLAVICLE_LEFT,
+            K4ABT_JOINT_SHOULDER_LEFT,
+            K4ABT_JOINT_ELBOW_LEFT,
+            K4ABT_JOINT_WRIST_LEFT,
+            K4ABT_JOINT_HAND_LEFT,
+            K4ABT_JOINT_HANDTIP_LEFT,
+            K4ABT_JOINT_THUMB_LEFT,
+            K4ABT_JOINT_CLAVICLE_RIGHT,
+            K4ABT_JOINT_SHOULDER_RIGHT,
+            K4ABT_JOINT_ELBOW_RIGHT,
+            K4ABT_JOINT_WRIST_RIGHT,
+            K4ABT_JOINT_HAND_RIGHT,
+            K4ABT_JOINT_HANDTIP_RIGHT,
+            K4ABT_JOINT_THUMB_RIGHT,
+            K4ABT_JOINT_HIP_LEFT,
+            K4ABT_JOINT_KNEE_LEFT,
+            K4ABT_JOINT_ANKLE_LEFT,
+            K4ABT_JOINT_FOOT_LEFT,
+            K4ABT_JOINT_HIP_RIGHT,
+            K4ABT_JOINT_KNEE_RIGHT,
+            K4ABT_JOINT_ANKLE_RIGHT,
+            K4ABT_JOINT_FOOT_RIGHT,
+            K4ABT_JOINT_HEAD,
+            K4ABT_JOINT_NOSE,
+            K4ABT_JOINT_EYE_LEFT,
+            K4ABT_JOINT_EAR_LEFT,
+            K4ABT_JOINT_EYE_RIGHT,
+            K4ABT_JOINT_EAR_RIGHT,
+            K4ABT_JOINT_COUNT,
+        }
+
         [DllImport("k4a", CallingConvention = k4aCallingConvention)]
         [NativeReference]
         public static extern k4a_result_t k4a_set_allocator(
@@ -370,6 +427,81 @@ namespace Microsoft.Azure.Kinect.Sensor
             IntPtr message_cb_context,
             LogLevel min_level);
 
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern k4a_result_t k4abt_tracker_create(
+            [In] ref Calibration sensor_calibration,
+            BodyTrackerConfiguration config,
+            out k4abt_tracker_t tracker_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern void k4abt_tracker_destroy(IntPtr tracker_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern void k4abt_tracker_set_temporal_smoothing(
+            k4abt_tracker_t tracker_handle,
+            float smoothing_factor);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern k4a_wait_result_t k4abt_tracker_enqueue_capture(
+            k4abt_tracker_t tracker_handle,
+            k4a_capture_t sensor_capture_handle,
+            int timeout_in_ms);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern k4a_wait_result_t k4abt_tracker_pop_result(
+            k4abt_tracker_t tracker_handle,
+            out k4abt_frame_t body_frame_handle,
+            int timeout_in_ms);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern void k4abt_tracker_shutdown(k4abt_tracker_t tracker_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern void k4abt_frame_release(IntPtr body_frame_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern void k4abt_frame_reference(IntPtr body_frame_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern uint k4abt_frame_get_num_bodies(k4abt_frame_t body_frame_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern k4a_result_t k4abt_frame_get_body_skeleton(k4abt_frame_t body_frame_handle, uint index, out Skeleton skeleton);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern uint k4abt_frame_get_body_id(k4abt_frame_t body_frame_handle, uint index);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern ulong k4abt_frame_get_device_timestamp_usec(k4abt_frame_t body_frame_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern k4a_image_t k4abt_frame_get_body_index_map(k4abt_frame_t body_frame_handle);
+
+        [DllImport("k4abt", CallingConvention = CallingConvention.Cdecl)]
+        [NativeReference]
+        public static extern k4a_capture_t k4abt_frame_get_capture(k4abt_frame_t body_frame_handle);
+
+        [NativeReference]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct k4abt_tracker_configuration_t
+        {
+            public k4abt_sensor_orientation_t sensor_orientation;
+            public bool cpu_only_mode;
+        }
+
         [NativeReference]
         [StructLayout(LayoutKind.Sequential)]
         public struct k4a_version_t
@@ -424,7 +556,31 @@ namespace Microsoft.Azure.Kinect.Sensor
             public bool disable_streaming_indicator;
         }
 
-        public class k4a_device_t : Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+        [NativeReference]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct k4abt_joint_t
+        {
+            public Vector3 position;
+            public Quaternion orientation;
+        }
+
+        [NativeReference]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct k4abt_skeleton_t
+        {
+            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = (int)k4abt_joint_id_t.K4ABT_JOINT_COUNT)]
+            public k4abt_joint_t[] joints;
+        }
+
+        [NativeReference]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct k4abt_body_t
+        {
+            public uint id;
+            public k4abt_skeleton_t skeleton;
+        }
+
+        public sealed class k4a_device_t : Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
         {
             private k4a_device_t()
                 : base(true)
@@ -438,7 +594,7 @@ namespace Microsoft.Azure.Kinect.Sensor
             }
         }
 
-        public class k4a_capture_t : Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+        public sealed class k4a_capture_t : Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
         {
             private k4a_capture_t()
                 : base(true)
@@ -462,7 +618,7 @@ namespace Microsoft.Azure.Kinect.Sensor
             }
         }
 
-        public class k4a_image_t : Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+        public sealed class k4a_image_t : Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
         {
             private k4a_image_t()
                 : base(true)
@@ -488,7 +644,7 @@ namespace Microsoft.Azure.Kinect.Sensor
             }
         }
 
-        public class k4a_transformation_t : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+        public sealed class k4a_transformation_t : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
         {
             private k4a_transformation_t()
                 : base(true)
@@ -526,6 +682,44 @@ namespace Microsoft.Azure.Kinect.Sensor
                     GyroSample = this.gyro_sample,
                     GyroTimestamp = TimeSpan.FromTicks(checked((long)this.gyro_timestamp_usec) * 10),
                 };
+            }
+        }
+
+        public sealed class k4abt_tracker_t : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+        {
+            private k4abt_tracker_t()
+                : base(true)
+            {
+            }
+
+            protected override bool ReleaseHandle()
+            {
+                k4abt_tracker_destroy(this.handle);
+                return true;
+            }
+        }
+
+        public sealed class k4abt_frame_t : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+        {
+            private k4abt_frame_t()
+                : base(true)
+            {
+            }
+
+            public k4abt_frame_t DuplicateReference()
+            {
+                k4abt_frame_t duplicate = new k4abt_frame_t();
+
+                k4abt_frame_reference(this.handle);
+
+                duplicate.handle = this.handle;
+                return duplicate;
+            }
+
+            protected override bool ReleaseHandle()
+            {
+                k4abt_frame_release(this.handle);
+                return true;
             }
         }
     }
